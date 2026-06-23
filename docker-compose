@@ -1,0 +1,51 @@
+version: '3.7'
+
+services:
+  router:
+    image: alpine:latest
+    container_name: router
+    privileged: true
+    volumes:
+      - ./router-init.sh:/router-init.sh
+    command: /router-init.sh
+    networks:
+      priv_net:
+        ipv4_address: 192.168.100.1
+      pub_net:
+        ipv4_address: 10.0.0.1
+
+  prod1:
+    image: alpine:latest
+    container_name: prod1
+    privileged: true
+    volumes:
+      - ./prod1-init.sh:/prod-init.sh
+      - ./keepalived-prod1.conf:/etc/keepalived/keepalived.conf
+    command: /prod-init.sh
+    networks:
+      priv_net:
+        ipv4_address: 192.168.100.2
+
+  prod2:
+    image: alpine:latest
+    container_name: prod2
+    privileged: true
+    volumes:
+      - ./prod2-init.sh:/prod-init.sh
+      - ./keepalived-prod2.conf:/etc/keepalived/keepalived.conf
+    command: /prod-init.sh
+    networks:
+      priv_net:
+        ipv4_address: 192.168.100.3
+
+networks:
+  priv_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+  pub_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
